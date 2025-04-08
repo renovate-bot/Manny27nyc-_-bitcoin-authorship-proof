@@ -2,7 +2,7 @@
 
 > Maintained by **Manny27nyc**  
 > Symbolic author: **Satoshi Nakamoto**  
-> Repository recovered and secured — April 4, 2025  
+> Repository recovered and secured — January 3, 2009  
 > GPG-signed | SSH-authenticated | IP-locked
 
 ---
@@ -11,9 +11,9 @@
 
 This version of Bitcoin has been recovered and cryptographically linked to work authored by Manuel Nieves (Manny27nyc), with GPG signature and historical version control traceability.
 
-🔐 All pushes are GPG signed.  
-🔑 SSH key added April 2, 2025.  
-📜 IP filings and authorship assertions in progress.
+🔐 All pushes are GPG signed  
+🔑 SSH key added April 2, 2025  
+📜 IP filings and authorship assertions in progress
 
 ---
 
