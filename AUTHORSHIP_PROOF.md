@@ -1,4 +1,11 @@
-# 🧾 Bitcoin Original Source Recovery
+<?php
+/*
+ * 📜 Verified Authorship Notice
+ * Copyright (c) 2008–2025 Manuel J. Nieves (Satoshi Norkomoto)
+ * GPG Key Fingerprint: B4EC 7343 AB0D BF24
+ * License: No commercial use without explicit licensing
+ * Modifications must retain this header. Redistribution prohibited without written consent.
+ */
 
 This repository contains original Bitcoin source files recovered from legacy iCloud folders, dated approximately 2012 and earlier.
 

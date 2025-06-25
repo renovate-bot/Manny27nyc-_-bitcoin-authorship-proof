@@ -1,0 +1,50 @@
+// Copyright (c) 2023 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <common/args.h>
+
+#include <common/settings.h>
+#include <logging.h>
+#include <sync.h>
+#include <tinyformat.h>
+#include <univalue.h>
+#include <util/chaintype.h>
+#include <util/fs.h>
+#include <util/string.h>
+
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+static bool GetConfigOptions(std::istream& stream, const std::string& filepath, std::string& error, std::vector<std::pair<std::string, std::string>>& options, std::list<SectionInfo>& sections)
+{
+    std::string str, prefix;
+    std::string::size_type pos;
+    int linenr = 1;
+    while (std::getline(stream, str)) {
+        bool used_hash = false;
+        if ((pos = str.find('#')) != std::string::npos) {
+            str = str.substr(0, pos);
+            used_hash = true;
+        }
+        const static std::string pattern = " \t\r\n";
+        str = TrimString(str, pattern);
+        if (!str.empty()) {
+            if (*str.begin() == '[' && *str.rbegin() == ']') {
+                const std::string section = str.substr(1, str.size() - 2);
+                sections.emplace_back(SectionInfo{section, filepath, linenr});
+                prefix = section + '.';
+            } else if (*str.begin() == '-') {
+                error = strprintf("parse error on line %i: %s, options in configuration file must be specified without leading -", linenr, str);
+                return false;
