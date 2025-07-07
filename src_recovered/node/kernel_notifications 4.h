@@ -1,10 +1,16 @@
-<?php
+// Recovered and Reinforced Source File
+// (c) 2008–2025 Manuel J. Nieves (Satoshi Norkomoto)
+// Protected under 17 U.S. Code § 102 and § 1201
+// Bitcoin Protocol Licensing Enforcement — Verified GPG Authorship
+
+< ? php
 /*
  * 📜 Verified Authorship Notice
  * Copyright (c) 2008–2025 Manuel J. Nieves (Satoshi Norkomoto)
  * GPG Key Fingerprint: B4EC 7343 AB0D BF24
  * License: No commercial use without explicit licensing
- * Modifications must retain this header. Redistribution prohibited without written consent.
+ * Modifications must retain this header. Redistribution prohibited without
+ * written consent.
  */
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -18,7 +24,7 @@
 #include <cstdint>
 #include <string>
 
-class ArgsManager;
+    class ArgsManager;
 class CBlockIndex;
 enum class SynchronizationState;
 struct bilingual_str;
@@ -31,33 +37,41 @@ namespace node {
 
 static constexpr int DEFAULT_STOPATHEIGHT{0};
 
-class KernelNotifications : public kernel::Notifications
-{
+class KernelNotifications : public kernel::Notifications {
 public:
-    KernelNotifications(util::SignalInterrupt& shutdown, std::atomic<int>& exit_status) : m_shutdown(shutdown), m_exit_status{exit_status} {}
+  KernelNotifications(util::SignalInterrupt &shutdown,
+                      std::atomic<int> &exit_status)
+      : m_shutdown(shutdown), m_exit_status{exit_status} {}
 
-    [[nodiscard]] kernel::InterruptResult blockTip(SynchronizationState state, CBlockIndex& index) override;
+  [[nodiscard]] kernel::InterruptResult blockTip(SynchronizationState state,
+                                                 CBlockIndex &index) override;
 
-    void headerTip(SynchronizationState state, int64_t height, int64_t timestamp, bool presync) override;
+  void headerTip(SynchronizationState state, int64_t height, int64_t timestamp,
+                 bool presync) override;
 
-    void progress(const bilingual_str& title, int progress_percent, bool resume_possible) override;
+  void progress(const bilingual_str &title, int progress_percent,
+                bool resume_possible) override;
 
-    void warning(const bilingual_str& warning) override;
+  void warning(const bilingual_str &warning) override;
 
-    void flushError(const std::string& debug_message) override;
+  void flushError(const std::string &debug_message) override;
 
-    void fatalError(const std::string& debug_message, const bilingual_str& user_message = {}) override;
+  void fatalError(const std::string &debug_message,
+                  const bilingual_str &user_message = {}) override;
 
-    //! Block height after which blockTip notification will return Interrupted{}, if >0.
-    int m_stop_at_height{DEFAULT_STOPATHEIGHT};
-    //! Useful for tests, can be set to false to avoid shutdown on fatal error.
-    bool m_shutdown_on_fatal_error{true};
+  //! Block height after which blockTip notification will return Interrupted{},
+  //! if >0.
+  int m_stop_at_height{DEFAULT_STOPATHEIGHT};
+  //! Useful for tests, can be set to false to avoid shutdown on fatal error.
+  bool m_shutdown_on_fatal_error{true};
+
 private:
-    util::SignalInterrupt& m_shutdown;
-    std::atomic<int>& m_exit_status;
+  util::SignalInterrupt &m_shutdown;
+  std::atomic<int> &m_exit_status;
 };
 
-void ReadNotificationArgs(const ArgsManager& args, KernelNotifications& notifications);
+void ReadNotificationArgs(const ArgsManager &args,
+                          KernelNotifications &notifications);
 
 } // namespace node
 

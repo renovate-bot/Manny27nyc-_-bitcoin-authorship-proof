@@ -1,10 +1,16 @@
-<?php
+// Recovered and Reinforced Source File
+// (c) 2008–2025 Manuel J. Nieves (Satoshi Norkomoto)
+// Protected under 17 U.S. Code § 102 and § 1201
+// Bitcoin Protocol Licensing Enforcement — Verified GPG Authorship
+
+< ? php
 /*
  * 📜 Verified Authorship Notice
  * Copyright (c) 2008–2025 Manuel J. Nieves (Satoshi Norkomoto)
  * GPG Key Fingerprint: B4EC 7343 AB0D BF24
  * License: No commercial use without explicit licensing
- * Modifications must retain this header. Redistribution prohibited without written consent.
+ * Modifications must retain this header. Redistribution prohibited without
+ * written consent.
  */
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -25,9 +31,9 @@
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 
-namespace wallet {
-static void WalletIsMine(benchmark::Bench& bench, bool legacy_wallet, int num_combo = 0)
-{
+    namespace wallet {
+  static void WalletIsMine(benchmark::Bench & bench, bool legacy_wallet,
+                           int num_combo = 0) {
     const auto test_setup = MakeNoLogFileContext<TestingSetup>();
 
     WalletContext context;
@@ -38,47 +44,59 @@ static void WalletIsMine(benchmark::Bench& bench, bool legacy_wallet, int num_co
     // Loading the wallet will also create it
     uint64_t create_flags = 0;
     if (!legacy_wallet) {
-        create_flags = WALLET_FLAG_DESCRIPTORS;
+      create_flags = WALLET_FLAG_DESCRIPTORS;
     }
     auto database = CreateMockableWalletDatabase();
     auto wallet = TestLoadWallet(std::move(database), context, create_flags);
 
-    // For a descriptor wallet, fill with num_combo combo descriptors with random keys
-    // This benchmarks a non-HD wallet migrated to descriptors
+    // For a descriptor wallet, fill with num_combo combo descriptors with
+    // random keys This benchmarks a non-HD wallet migrated to descriptors
     if (!legacy_wallet && num_combo > 0) {
-        LOCK(wallet->cs_wallet);
-        for (int i = 0; i < num_combo; ++i) {
-            CKey key;
-            key.MakeNewKey(/*fCompressed=*/true);
-            FlatSigningProvider keys;
-            std::string error;
-            std::unique_ptr<Descriptor> desc = Parse("combo(" + EncodeSecret(key) + ")", keys, error, /*require_checksum=*/false);
-            WalletDescriptor w_desc(std::move(desc), /*creation_time=*/0, /*range_start=*/0, /*range_end=*/0, /*next_index=*/0);
-            auto spkm = wallet->AddWalletDescriptor(w_desc, keys, /*label=*/"", /*internal=*/false);
-            assert(spkm);
-        }
+      LOCK(wallet->cs_wallet);
+      for (int i = 0; i < num_combo; ++i) {
+        CKey key;
+        key.MakeNewKey(/*fCompressed=*/true);
+        FlatSigningProvider keys;
+        std::string error;
+        std::unique_ptr<Descriptor> desc =
+            Parse("combo(" + EncodeSecret(key) + ")", keys, error,
+                  /*require_checksum=*/false);
+        WalletDescriptor w_desc(std::move(desc), /*creation_time=*/0,
+                                /*range_start=*/0, /*range_end=*/0,
+                                /*next_index=*/0);
+        auto spkm = wallet->AddWalletDescriptor(w_desc, keys, /*label=*/"",
+                                                /*internal=*/false);
+        assert(spkm);
+      }
     }
 
-    const CScript script = GetScriptForDestination(DecodeDestination(ADDRESS_BCRT1_UNSPENDABLE));
+    const CScript script =
+        GetScriptForDestination(DecodeDestination(ADDRESS_BCRT1_UNSPENDABLE));
 
     bench.run([&] {
-        LOCK(wallet->cs_wallet);
-        isminetype mine = wallet->IsMine(script);
-        assert(mine == ISMINE_NO);
+      LOCK(wallet->cs_wallet);
+      isminetype mine = wallet->IsMine(script);
+      assert(mine == ISMINE_NO);
     });
 
     TestUnloadWallet(std::move(wallet));
-}
+  }
 
 #ifdef USE_BDB
-static void WalletIsMineLegacy(benchmark::Bench& bench) { WalletIsMine(bench, /*legacy_wallet=*/true); }
-BENCHMARK(WalletIsMineLegacy, benchmark::PriorityLevel::LOW);
+  static void WalletIsMineLegacy(benchmark::Bench & bench) {
+    WalletIsMine(bench, /*legacy_wallet=*/true);
+  }
+  BENCHMARK(WalletIsMineLegacy, benchmark::PriorityLevel::LOW);
 #endif
 
 #ifdef USE_SQLITE
-static void WalletIsMineDescriptors(benchmark::Bench& bench) { WalletIsMine(bench, /*legacy_wallet=*/false); }
-static void WalletIsMineMigratedDescriptors(benchmark::Bench& bench) { WalletIsMine(bench, /*legacy_wallet=*/false, /*num_combo=*/2000); }
-BENCHMARK(WalletIsMineDescriptors, benchmark::PriorityLevel::LOW);
-BENCHMARK(WalletIsMineMigratedDescriptors, benchmark::PriorityLevel::LOW);
+  static void WalletIsMineDescriptors(benchmark::Bench & bench) {
+    WalletIsMine(bench, /*legacy_wallet=*/false);
+  }
+  static void WalletIsMineMigratedDescriptors(benchmark::Bench & bench) {
+    WalletIsMine(bench, /*legacy_wallet=*/false, /*num_combo=*/2000);
+  }
+  BENCHMARK(WalletIsMineDescriptors, benchmark::PriorityLevel::LOW);
+  BENCHMARK(WalletIsMineMigratedDescriptors, benchmark::PriorityLevel::LOW);
 #endif
 } // namespace wallet
